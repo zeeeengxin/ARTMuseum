@@ -1,62 +1,52 @@
-var express = require("express");
-var router = express.Router();
-var passport = require("passport");
-var User = require("../models/user");
+var express 	= require("express"),
+	router		= express.Router(),
+	passport 	= require("passport"),
+	User 		= require("../models/user");
 
+// landing page
 router.get("/", function(req, res) {
-    res.render("landing");
+	res.render("landing");
 });
 
-// ============
-// auth routes
-// ============
-
+// auth routes:
+// register page
 router.get("/register", function(req, res) {
-    res.render("register");
+	res.render("register", {page: 'register'});
 });
-
-// handle sign up logic
+// register logic
 router.post("/register", function(req, res) {
-    var newUser = new User( { username: req.body.username});
-    User.register(newUser, req.body.password, function(err, user) {
-        if (err) {
-            return res.render("register", {"error": err.message});
-            // solution2:
-            // req.flash("error", err.message); 
-            // return res.redirect("/register");
-            
-            // if you use res.render("register"), it will not show the error message
-            // it just render the register.ejs page without 
-            // utilizing req.flash because it bypass route.get("/register")
-            // redirect is making a new request but render is not, render usually keep the old url
-            // or you can pass the error in
-        }
-        passport.authenticate("local")(req, res, function(){ 
-            req.flash("success", "Welcome to YelpCamp " + user.username);
-            // if register successfully, authenticate/login the user and redirect
-            res.redirect("/campgrounds");
-        });
-    });
+	var newUser = new User({username: req.body.username});
+	User.register(newUser, req.body.password, function(err, user) {
+		if (err) {
+			console.log(err);
+			return res.render("register", {"error": err.message});
+		}
+		passport.authenticate("local")(req, res, function() {
+			req.flash("success", "Welcome to ARTMuseum " + user.username + "!");
+			res.redirect("/art_museum/museums");
+		});
+	});
 });
 
 // show login form
 router.get("/login", function(req, res) {
-   res.render("login"); 
+	res.render("login", {page: 'login'});
 });
-// handle login logic
+// handle the login logic
 router.post("/login", passport.authenticate("local", 
-    {
-        successRedirect: "/campgrounds",
-        failureRedirect: "/login",
-        failureFlash: true, // to pop out error message if login failed
-    }), function (req, res) {
+	{
+		successRedirect: "/art_museum/museums",
+		failureRedirect: "/art_museum/login",
+		successFlash: "Welcome back!",
+		failureFlash: true
+	}), function (req, res) {
 });
 
+// log out route
 router.get("/logout", function(req, res) {
-    req.logout();
-    req.flash("success", "Logged out successfully");
-    res.redirect("/campgrounds");
+	req.logout();
+	req.flash("success", "Logged out successfully");
+	res.redirect("/art_museum/museums");
 });
 
 module.exports = router;
-

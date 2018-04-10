@@ -8,13 +8,11 @@ body {
   text-align: center;
   padding-top: 40vh;
 }
-/*We set the z-index to 1 so all of the elements inside the landing-header div will be in front of the background images*/
-/*The position is set to relative so we can use the z-index property; the default position value is static, which ignores z-index*/
-/*We use text-align to center our text and button (left and right center)*/
-/*We use padding-top to vertically center our div, since it's contents take up quite a bit of space we use 40vh (view height) instead of 50, this way the content looks more visually centered*/
 
 #landing-header h1 {
   color: #fff;
+  margin-bottom: 15px;
+  font-size: 3em;
 }
 
 .slideshow { 
@@ -28,8 +26,6 @@ body {
   margin: 0;
   padding: 0;
 }
-/*This will fix the ul to the window, positioning it in the top left corner and filling the entire screen by setting width and height to 100%*/
-/*list-style is set to none in order to hide the bullet points from the list's default styling*/
 
 .slideshow li { 
   width: 100%;
@@ -46,22 +42,22 @@ body {
 }
 
 .slideshow li:nth-child(1) { 
-  background-image: url(http://i.imgur.com/K3mPv14.jpg) 
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/e/ec/Monet_-_The_Magpie.jpg) 
 }
 .slideshow li:nth-child(2) { 
-  background-image: url(http://i.imgur.com/SBEmFpv.jpg);
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/6/60/Van_Gogh_-_Bl%C3%BChende_Mandelbaumzweige.jpeg);
   animation-delay: 10s; 
 }
 .slideshow li:nth-child(3) { 
-  background-image: url(http://i.imgur.com/emvhOnb.jpg);
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/f/f9/Huang_Gongwang._Dwelling_in_the_Fuchun_Mountains._detail._National_Palace_Museum%2C_Taipei.jpg);
   animation-delay: 20s; 
 }
 .slideshow li:nth-child(4) { 
-  background-image: url(http://i.imgur.com/2LSMCmJ.jpg);
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Ingre%2C_Grande_Odalisque.jpg/2560px-Ingre%2C_Grande_Odalisque.jpg);
   animation-delay: 30s; 
 }
 .slideshow li:nth-child(5) { 
-  background-image: url(http://i.imgur.com/TVGe0Ef.jpg);
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/0/0d/Great_Wave_off_Kanagawa2.jpg);
   animation-delay: 40s; 
 }
 

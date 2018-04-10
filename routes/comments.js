@@ -1,66 +1,65 @@
+var express 	= require("express");
+var router 		= express.Router({mergeParams: true});
+var Museum 		= require("../models/museum"); // include the models
+var Comment 	= require("../models/comment");
+var middleware 	= require("../middleware/index.js");
 
-// ======================
-// comment routes
-// ======================
-
-var express = require("express");
-var router = express.Router({mergeParams: true}); // to access parent route's params e.i. camground_id
-var Campground = require("../models/campground"); // include the models
-var Comment = require("../models/comment");
-var middleware = require("../middleware");
-
-router.get("/new", middleware.isLoggedIn, function (req, res) {
-// req.param.id is not passed in, so we need express.Router({mergeParams: true})
-    Campground.findById(req.params.id, function(err, campground) {
-       if (err) {
-           console.log(err);
-       }  else {
-           res.render("comments/new", {campground : campground});
-       }
-    });
+// new comment form page
+router.get("/new", middleware.isLoggedIn, function(req, res) {
+	Museum.findById(req.params.id, function(err, museum) {
+		if (err) {
+			console.log(err);
+			req.flash("error", "Something went wrong, please try again later");
+			res.redirect("/art_museum/museums/" + req.params.id);
+		} else {
+			res.render("comments/new", {museum : museum});
+		}
+	});
 });
-
+// new comment post route
 router.post("/", middleware.isLoggedIn, function(req, res) {
-    Campground.findById(req.params.id, function(err, campground) {
+    Museum.findById(req.params.id, function(err, museum) {
         if (err) {
             console.log(err);
-            res.redirect("/campgrounds");
+            req.flash("error", "Something went wrong, please try again later");
+            res.redirect("/art_museum/museums");
         } else {
             Comment.create(req.body.comment, function(err, newComment) {
                 if (err) {
-                    req.flash("error", "Something went wrong");
+                    req.flash("error", "Something went wrong, please try again later");
                     console.log(err);
+                    res.redirect("/art_museum/museums");
                 } else {
-                    // add username and id to comment
-                    newComment.author.id = req.user._id; // because you've logged in
-                    // we can get your id by req.user.xxx
+                    newComment.author.id = req.user._id;
                     newComment.author.username = req.user.username;
                     newComment.save();
-                    campground.comments.push(newComment);
-                    campground.save();
-                    req.flash("success", "Successfully create comment");
-                    res.redirect("/campgrounds/" + campground._id);
-                    // can't just write "/campgrounds/:id"... not meaningful
+                    museum.comments.push(newComment);
+                    museum.save();
+                    req.flash("success", "Successfully created comment");
+                    res.redirect("/art_museum/museums/" + museum._id);
                 }
             });
         }
     });
 });
-
-// comment edit route
+// show comment edit page
 router.get("/:comment_id/edit", middleware.checkCommentOwnership, function(req, res) {
-    Campground.findById(req.params.id, function(err, foundCampground) {
-        // we need make sure that both campgroundid and comment id are valid
-        // comment id was checked in middleware
-        if (err || !foundCampground) {
-            req.flash("error", "No campground found");
+    Museum.findById(req.params.id, function(err, foundMuseum) {
+        if (err) {
+        	console.log(err);
+        	req.flash("error", "Something went wrong, please try again later");
+            return res.redirect("back");
+        } else if (!foundMuseum) {
+            req.flash("error", "No museum found");
             return res.redirect("back");
         }
         Comment.findById(req.params.comment_id, function(err, foundComment) {
             if (err) {
-               res.redirect("back");
+            	console.log(err);
+            	req.flash("error", "Something went wrong, please try again later");
+                res.redirect("back");
             }  else {
-                res.render("comments/edit", {campground_id: req.params.id, comment: foundComment});
+                res.render("comments/edit", {museum_id: req.params.id, comment: foundComment});
             }
         });
     });
@@ -70,24 +69,27 @@ router.get("/:comment_id/edit", middleware.checkCommentOwnership, function(req, 
 router.put("/:comment_id", middleware.checkCommentOwnership, function(req, res) {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment) {
         if(err) {
+        	console.log(err);
+            req.flash("error", "Something went wrong, please try again later");
             res.redirect("back");
         } else {
-            res.redirect("/campgrounds/" + req.params.id);
+            res.redirect("/art_museum/museums/" + req.params.id);
         }
     });
 });
 
-// comment destroy route
+// comment delete route
 router.delete("/:comment_id", middleware.checkCommentOwnership, function(req, res) {
    Comment.findByIdAndRemove(req.params.comment_id, function(err) {
        if (err) {
-           res.redirect("back");
+       		console.log(err);
+            req.flash("error", "Something went wrong, please try again later");
+            res.redirect("back");
        } else {
            req.flash("success", "Comment deleted");
-           res.redirect("/campgrounds/" + req.params.id);
+           res.redirect("/art_museum/museums/" + req.params.id);
        }
    }); 
 });
-
 
 module.exports = router;
